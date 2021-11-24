@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from datetime import datetime
-
+import random
 from predict import predict
 
 import naver_translate as nt
@@ -64,15 +64,15 @@ def text_input():
     sex_label = {0: "여자", 1: "남자"}
     '''
     # predict X
-    e_shape_pred = 1
-    h_length_pred = 1
-    nose_pred = 1
+    e_shape_pred = random.randrange(0,4)
+    nose_pred = random.randrange(0,2)
     
     # predict
-    f_shape_pred = 0
-    h_curl_pred = 0
-    h_bang_pred = 0
-    sex_pred = 0
+    h_length_pred = random.randrange(0,4) # not good
+    f_shape_pred = random.randrange(0,4)
+    h_curl_pred = random.randrange(0,3)
+    h_bang_pred = random.randrange(0,3)
+    sex_pred = random.randrange(0,2)
 
 
     s1 = en_text.split('.')
@@ -85,26 +85,32 @@ def text_input():
         _key = predict(s)[0]
         key = _key[:-1]
         lv = int(_key[-1])
-
+        print(s)
         if key == 's':
             sex_pred = lv
             print("sex_pred : ", _key)
         elif key == 'fs':
             f_shape_pred = lv
             print("f_shape_pred : ", _key)
+        elif key == 'hl':
+            h_length_pred = lv
+            print("h_length_pred : ", _key)
+        elif key == 'hb':
+            h_bang_pred = lv
+            if lv == 1:
+                h_length_pred = random.randrange(1,3)
+            print("h_bang_pred : ", _key)
+            print("h_length_pred : ", h_length_pred)
         elif key == 'hc':
             h_curl_pred = lv
             print("h_curl_pred : ", _key)
-        elif key == 'hb':
-            h_bang_pred = lv
-            print("h_bang_pred : ", _key)
 
-    print("f_shape_pred {} / h_curl_pred {} / h_bang_pred {} / sex_pred {}".format(f_shape_pred, h_curl_pred, h_bang_pred, sex_pred))
+    print("f_shape_pred {} / h_curl_pred {} / h_bang_pred {} / sex_pred {} / h_length_pred {}".format(f_shape_pred, h_curl_pred, h_bang_pred, sex_pred, h_length_pred))
 
 
     # test - input
     '''
-    He has long bangs.She has round face.He is middle-aged white man.He has brown short hair, and it's curly.
+    He has long bangs. He has round face. He is middle-aged white man. He has brown short hair, and it's curly.
     She has long bangs.She has long face.She is middle-aged white woman.She has brown short hair, and it's curly.
     '''
     result = ''.join(str(_) for _ in [e_shape_pred, f_shape_pred, h_curl_pred, h_bang_pred, h_length_pred, nose_pred, sex_pred])
